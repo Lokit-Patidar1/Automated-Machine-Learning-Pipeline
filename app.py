@@ -1,24 +1,39 @@
-# Import files 
 import streamlit as st
 import pandas as pd
-import os 
+import os
 
-# EDA import files  
-from ydata_profiling import ProfileReport
-from streamlit_pandas_profiling import st_profile_report
+st.set_page_config(page_title="AutoMLpipeline", layout="wide")
 
-# ML imports 
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, classification_report, mean_squared_error, r2_score
-from sklearn.linear_model import LogisticRegression, LinearRegression
-from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
-from sklearn.svm import SVC, SVR 
+# Note: Heavy ML libraries (scikit-learn) are imported lazily inside functions
+
+# ----------------- CACHING HELPERS ----------------- #
+@st.cache_data(show_spinner=False)
+def load_dataframe_from_disk(path: str):
+    return pd.read_csv(path, index_col=None)
+
+@st.cache_data(show_spinner=False)
+def read_uploaded_file(file):
+    if file.name.endswith(".csv"):
+        return pd.read_csv(file)
+    return pd.read_excel(file)
+
+@st.cache_data(show_spinner=True, max_entries=5)
+def cached_ml_pipeline(df, target_col, problem_type, selected_models):
+    # Ensure stable hashing of selection for cache key
+    if isinstance(selected_models, list):
+        selected_models = tuple(selected_models)
+    return ml_pipeline(df, target_col, problem_type, selected_models)
 
 # ----------------- ML FUNCTIONS ----------------- #
 def train_classification_models(X_train, X_test, y_train, y_test, selected_models):
+    # Lazy-import heavy estimators
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.ensemble import RandomForestClassifier
+    from sklearn.svm import SVC
+    from sklearn.metrics import accuracy_score, classification_report
     models = {
         "Logistic Regression": LogisticRegression(max_iter=1000),
-        "Random Forest": RandomForestClassifier(),
+        "Random Forest": RandomForestClassifier(n_jobs=-1),
         "SVM": SVC()
     }
     results = {}
@@ -34,9 +49,14 @@ def train_classification_models(X_train, X_test, y_train, y_test, selected_model
 
 
 def train_regression_models(X_train, X_test, y_train, y_test, selected_models):
+    # Lazy-import heavy estimators
+    from sklearn.linear_model import LinearRegression
+    from sklearn.ensemble import RandomForestRegressor
+    from sklearn.svm import SVR
+    from sklearn.metrics import mean_squared_error, r2_score
     models = {
         "Linear Regression": LinearRegression(),
-        "Random Forest Regressor": RandomForestRegressor(),
+        "Random Forest Regressor": RandomForestRegressor(n_jobs=-1),
         "SVR": SVR()
     }
     results = {}
@@ -52,6 +72,7 @@ def train_regression_models(X_train, X_test, y_train, y_test, selected_models):
 
 
 def ml_pipeline(df, target_col, problem_type, selected_models):
+    from sklearn.model_selection import train_test_split
     X = df.drop(columns=[target_col])
     y = df[target_col]
 
@@ -77,20 +98,17 @@ with st.sidebar:
     st.info("This application allows you to build an automated ML pipeline using Streamlit")
 
 
-# Load dataset if exists
+# Load dataset if exists (cached)
 df = None
 if os.path.exists("sourcedata.csv"):
-    df = pd.read_csv("sourcedata.csv", index_col=None)
+    df = load_dataframe_from_disk("sourcedata.csv")
 
 
 if choice == "Upload Your Dataset":
     st.title("Upload Your Dataset Here")
     file = st.file_uploader("Upload your file (CSV/Excel)", type=["csv", "xlsx"])
     if file:
-        if file.name.endswith(".csv"):
-            df = pd.read_csv(file)
-        else:
-            df = pd.read_excel(file)
+        df = read_uploaded_file(file)
         df.to_csv("sourcedata.csv", index=None)
         st.dataframe(df.head())
 
@@ -102,8 +120,26 @@ elif choice == "Exploratory Data Analysis":
         st.write(df.shape)
         st.write(df.dtypes)
         st.write(df.describe())
-        profile_report = ProfileReport(df, explorative=True)
-        st_profile_report(profile_report) 
+        # Heavy EDA profiling gated behind a button and lazy imports
+        enable_minimal = st.checkbox("Use minimal profiling (faster, fewer computations)", value=True)
+        suggested_rows = min(5000, len(df)) if len(df) > 0 else 0
+        max_rows = st.number_input("Max rows to profile (0 = all rows)", min_value=0, value=suggested_rows)
+        if st.button("Generate Profiling Report"):
+            # Optionally sample to speed up profiling
+            df_to_profile = df if max_rows == 0 else df.head(int(max_rows))
+            try:
+                from ydata_profiling import ProfileReport
+                from streamlit_pandas_profiling import st_profile_report
+            except Exception:
+                st.warning("Profiling dependencies are not installed. Install 'ydata-profiling' and 'streamlit-pandas-profiling'.")
+            else:
+                with st.spinner("Generating profile report..."):
+                    profile_report = ProfileReport(
+                        df_to_profile,
+                        explorative=not enable_minimal,
+                        minimal=enable_minimal,
+                    )
+                    st_profile_report(profile_report)
     else:
         st.warning("Please upload a dataset first.")
 
@@ -123,7 +159,8 @@ elif choice == "ML":
         selected_models = st.multiselect("Select Models to Train", available_models, default=available_models)
 
         if st.button("Train Models"):
-            results = ml_pipeline(df, target_col, problem_type, selected_models)
+            # Cache full ML run to speed up repeated experiments
+            results = cached_ml_pipeline(df, target_col, problem_type, selected_models)
 
             # Show results
             st.subheader("Model Performance")
@@ -132,7 +169,7 @@ elif choice == "ML":
             best_model_choice = st.selectbox("Select Best Model", results.keys())
             st.success(f"You selected: {best_model_choice}")
     else:
-        st.warning("Please upload a dataset first.") 
+        st.warning("Please upload a dataset first.")
 
 
 elif choice == "Download":
