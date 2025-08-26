@@ -5,7 +5,7 @@ from sklearn.svm import SVC, SVR
 
 
 def get_optimized_models(problem_type: str) -> Dict[str, Any]:
-    """Get optimized model configurations by problem type."""
+    """Get optimized model configurations"""
     if problem_type == "Classification":
         return {
             "Logistic Regression": LogisticRegression(
@@ -39,3 +39,5 @@ def get_optimized_models(problem_type: str) -> Dict[str, Any]:
                 C=1.0
             )
         }
+
+

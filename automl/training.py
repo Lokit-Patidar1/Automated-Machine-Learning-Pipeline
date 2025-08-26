@@ -4,22 +4,18 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score, classification_report, mean_squared_error, r2_score
 from sklearn.model_selection import cross_val_score
-import streamlit as st
 
 from .models import get_optimized_models
 
 
-def train_classification_models(
-    X_train: pd.DataFrame,
-    X_test: pd.DataFrame,
-    y_train: pd.Series,
-    y_test: pd.Series,
-    selected_models: List[str]
-) -> Dict[str, Dict[str, Any]]:
-    """Optimized classification model training with cross-validation."""
+def train_classification_models(X_train: pd.DataFrame, X_test: pd.DataFrame,
+                              y_train: pd.Series, y_test: pd.Series,
+                              selected_models: List[str]) -> Dict[str, Dict[str, Any]]:
+    """Optimized classification model training with cross-validation"""
     models = get_optimized_models("Classification")
     results: Dict[str, Dict[str, Any]] = {}
 
+    # Scale features for SVM and Logistic Regression
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train)
     X_test_scaled = scaler.transform(X_test)
@@ -27,6 +23,8 @@ def train_classification_models(
     for model_name in selected_models:
         try:
             model = models[model_name]
+
+            # Use scaled data for models that benefit from scaling
             if model_name in ["Logistic Regression", "SVM"]:
                 model.fit(X_train_scaled, y_train)
                 y_pred = model.predict(X_test_scaled)
@@ -45,26 +43,25 @@ def train_classification_models(
                 "CV_Std": round(cv_scores.std(), 4),
                 "Report": report,
                 "Model": model,
-                "Scaler": scaler if model_name in ["Logistic Regression", "SVM"] else None,
+                "Scaler": scaler if model_name in ["Logistic Regression", "SVM"] else None
             }
+
         except Exception as e:
-            st.error(f"Error training {model_name}: {str(e)}")
+            # Let caller handle UI errors; return partial results
+            results[model_name] = {"error": str(e)}
             continue
 
     return results
 
 
-def train_regression_models(
-    X_train: pd.DataFrame,
-    X_test: pd.DataFrame,
-    y_train: pd.Series,
-    y_test: pd.Series,
-    selected_models: List[str]
-) -> Dict[str, Dict[str, Any]]:
-    """Optimized regression model training with cross-validation."""
+def train_regression_models(X_train: pd.DataFrame, X_test: pd.DataFrame,
+                          y_train: pd.Series, y_test: pd.Series,
+                          selected_models: List[str]) -> Dict[str, Dict[str, Any]]:
+    """Optimized regression model training with cross-validation"""
     models = get_optimized_models("Regression")
     results: Dict[str, Dict[str, Any]] = {}
 
+    # Scale features for SVR and Linear Regression
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train)
     X_test_scaled = scaler.transform(X_test)
@@ -72,6 +69,8 @@ def train_regression_models(
     for model_name in selected_models:
         try:
             model = models[model_name]
+
+            # Use scaled data for models that benefit from scaling
             if model_name in ["Linear Regression", "SVR"]:
                 model.fit(X_train_scaled, y_train)
                 y_pred = model.predict(X_test_scaled)
@@ -92,10 +91,13 @@ def train_regression_models(
                 "CV_Mean": round(cv_scores.mean(), 4),
                 "CV_Std": round(cv_scores.std(), 4),
                 "Model": model,
-                "Scaler": scaler if model_name in ["Linear Regression", "SVR"] else None,
+                "Scaler": scaler if model_name in ["Linear Regression", "SVR"] else None
             }
+
         except Exception as e:
-            st.error(f"Error training {model_name}: {str(e)}")
+            results[model_name] = {"error": str(e)}
             continue
 
     return results
+
+

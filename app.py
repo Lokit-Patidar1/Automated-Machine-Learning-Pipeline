@@ -1,8 +1,8 @@
-# Import files 
 import streamlit as st
 import pandas as pd
 import os 
 import numpy as np
+from typing import Dict, Any, Tuple, List
 import pickle
 import io
 
@@ -10,16 +10,12 @@ import io
 from ydata_profiling import ProfileReport
 from streamlit_pandas_profiling import st_profile_report
 
-# Import automl package modules
+# Internal AutoML modules
 from automl import (
+    preprocess_data,
     ml_pipeline,
     save_model,
 )
-
-import warnings
-warnings.filterwarnings('ignore')
-
-# ------------------------------------------------ #
 
 # ----------------- STREAMLIT APP ---------------- #
 # Page configuration
