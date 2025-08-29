@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row g-3">
+	<div class="col-md-3">
+		<div class="card text-center">
+			<div class="card-body">
+				<h5 class="card-title">Rows</h5>
+				<p class="display-6">{{ shape.0 }}</p>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-3">
+		<div class="card text-center">
+			<div class="card-body">
+				<h5 class="card-title">Columns</h5>
+				<p class="display-6">{{ shape.1 }}</p>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-3">
+		<div class="card text-center">
+			<div class="card-body">
+				<h5 class="card-title">Numeric</h5>
+				<p class="display-6">{{ numeric_cols }}</p>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-3">
+		<div class="card text-center">
+			<div class="card-body">
+				<h5 class="card-title">Categorical</h5>
+				<p class="display-6">{{ categorical_cols }}</p>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="row mt-4">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-body">
+				<h4 class="card-title">Preview</h4>
+				{{ head_html|safe }}
+			</div>
+		</div>
+	</div>
+</div>
+<div class="row mt-4">
+	<div class="col-lg-6">
+		<div class="card">
+			<div class="card-body">
+				<h4 class="card-title">Statistical Summary</h4>
+				{{ describe_html|safe }}
+			</div>
+		</div>
+	</div>
+	<div class="col-lg-6">
+		<div class="card">
+			<div class="card-body">
+				<h4 class="card-title">Dtypes</h4>
+				{{ dtypes_html|safe }}
+			</div>
+		</div>
+	</div>
+</div>
+<div class="mt-4">
+	<a class="btn btn-primary" href="/train/">Proceed to Training</a>
+</div>
+{% endblock %}

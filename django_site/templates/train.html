@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row">
+	<div class="col-lg-4">
+		<div class="card">
+			<div class="card-body">
+				<h4 class="card-title">Configuration</h4>
+				<form method="post">
+					{% csrf_token %}
+					<div class="mb-3">
+						<label class="form-label">Target Column</label>
+						<select class="form-select" name="target_col" required>
+							{% for col in df_columns %}<option>{{ col }}</option>{% endfor %}
+						</select>
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Problem Type</label>
+						<select class="form-select" name="problem_type">
+							<option>Classification</option>
+							<option>Regression</option>
+						</select>
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Models</label>
+						<select class="form-select" name="models" multiple size="6">
+							<option>Logistic Regression</option>
+							<option>Random Forest</option>
+							<option>SVM</option>
+							<option>Linear Regression</option>
+							<option>Random Forest Regressor</option>
+							<option>SVR</option>
+						</select>
+						<div class="form-text">Hold Ctrl/Cmd to select multiple.</div>
+					</div>
+					<button class="btn btn-primary" type="submit">Train</button>
+				</form>
+			</div>
+		</div>
+	</div>
+	<div class="col-lg-8">
+		{% if error %}
+		<div class="alert alert-danger">{{ error }}</div>
+		{% endif %}
+		{% if results %}
+		<div class="card">
+			<div class="card-body">
+				<h4 class="card-title">Results</h4>
+				<table class="table table-dark table-striped">
+					<thead><tr><th>Model</th><th>Metrics</th></tr></thead>
+					<tbody>
+						{% for model_name, metrics in results.items() %}
+						<tr>
+							<td><span class="badge text-bg-primary">{{ model_name }}</span></td>
+							<td>
+								{% for k, v in metrics.items() %}
+								<span class="badge text-bg-secondary me-1">{{ k }}: {{ v }}</span>
+								{% endfor %}
+							</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+				<div class="mt-2">
+					<a class="btn btn-outline-light" href="/download/?all=1">Download All</a>
+					{% for model_name, _ in results.items %}
+					<a class="btn btn-outline-info ms-2" href="/download/?name={{ model_name }}">Download {{ model_name }}</a>
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+		{% endif %}
+	</div>
+</div>
+{% endblock %}
