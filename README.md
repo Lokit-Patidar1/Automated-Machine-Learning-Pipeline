@@ -17,51 +17,21 @@ Automated-Machine-Learning-Pipeline/
 ├── app.py                    # Streamlit web application
 ├── ml_engine.py             # Consolidated ML engine (all ML functionality)
 ├── requirements.txt         # Python dependencies
-├── setup_venv.bat          # Windows virtual environment setup
-├── setup_venv.sh           # Linux/Mac virtual environment setup
 ├── sourcedata.csv          # Sample dataset (auto-generated)
 └── README.md               # This file
 ```
 
-## 🛠️ Installation & Setup
+## 🚀 Quick Start
 
-### Option 1: Automated Setup (Recommended)
-
-**For Windows:**
 ```bash
-# Run the setup script
-setup_venv.bat
+# Install dependencies
+pip install -r requirements.txt
+
+# Run the application
+streamlit run app.py
 ```
 
-**For Linux/Mac:**
-```bash
-# Make script executable and run
-chmod +x setup_venv.sh
-./setup_venv.sh
-```
-
-### Option 2: Manual Setup
-
-1. **Create Virtual Environment:**
-   ```bash
-   # Windows
-   python -m venv venv
-   venv\Scripts\activate
-   
-   # Linux/Mac
-   python3 -m venv venv
-   source venv/bin/activate
-   ```
-
-2. **Install Dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. **Run the Application:**
-   ```bash
-   streamlit run app.py
-   ```
+The application will open in your browser at `http://localhost:8501`
 
 ## 🎯 Usage
 
@@ -116,12 +86,14 @@ else:
 
 ## 🔧 Dependencies
 
-- **streamlit**: Web application framework
-- **pandas**: Data manipulation and analysis
-- **numpy**: Numerical computing
-- **scikit-learn**: Machine learning algorithms
-- **ydata-profiling**: Data profiling and EDA
-- **openpyxl**: Excel file support
+- **streamlit** (≥1.28.0): Web application framework
+- **pandas** (≥1.5.0): Data manipulation and analysis
+- **numpy** (2.1.3): Numerical computing
+- **matplotlib** (≥3.8.0): Data visualization
+- **scikit-learn** (≥1.3.0): Machine learning algorithms
+- **ydata-profiling** (≥4.0.0): Data profiling and EDA
+- **streamlit-pandas-profiling** (≥0.1.3): Streamlit integration for data profiling
+- **openpyxl** (≥3.1.0): Excel file support
 
 ## 📊 Features in Detail
 
