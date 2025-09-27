@@ -10,8 +10,8 @@ import io
 from ydata_profiling import ProfileReport
 from streamlit_pandas_profiling import st_profile_report
 
-# Internal AutoML modules
-from automl import (
+# Internal ML Engine
+from ml_engine import (
     preprocess_data,
     ml_pipeline,
     save_model,
