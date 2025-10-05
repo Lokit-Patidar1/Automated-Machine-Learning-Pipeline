@@ -60,16 +60,13 @@ def preprocess_data(df: pd.DataFrame, target_col: str) -> Tuple[pd.DataFrame, pd
 
     # Handle missing values
     if X.isnull().sum().sum() > 0:
-        # Fill numeric columns with median
         numeric_cols = X.select_dtypes(include=[np.number]).columns
         X[numeric_cols] = X[numeric_cols].fillna(X[numeric_cols].median())
 
-        # Fill categorical columns with mode
         categorical_cols = X.select_dtypes(include=['object']).columns
         for col in categorical_cols:
             X[col] = X[col].fillna(X[col].mode()[0] if not X[col].mode().empty else 'Unknown')
 
-    # Convert categorical variables with better handling
     X = pd.get_dummies(X, drop_first=True, dummy_na=False)
 
     return X, y
@@ -82,7 +79,6 @@ def train_classification_models(X_train: pd.DataFrame, X_test: pd.DataFrame,
     models = get_optimized_models("Classification")
     results: Dict[str, Dict[str, Any]] = {}
 
-    # Scale features for SVM and Logistic Regression
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train)
     X_test_scaled = scaler.transform(X_test)
@@ -166,7 +162,6 @@ def train_regression_models(X_train: pd.DataFrame, X_test: pd.DataFrame,
 
 def ml_pipeline(df: pd.DataFrame, target_col: str, problem_type: str,
                selected_models: List[str]) -> Dict[str, Dict[str, Any]]:
-    """Optimized ML pipeline with better error handling and preprocessing"""
     # Preprocess data
     X, y = preprocess_data(df, target_col)
 
