@@ -91,7 +91,6 @@ def train_classification_models(X_train: pd.DataFrame, X_test: pd.DataFrame,
         try:
             model = models[model_name]
 
-            # Use scaled data for models that benefit from scaling
             if model_name in ["Logistic Regression", "SVM"]:
                 model.fit(X_train_scaled, y_train)
                 y_pred = model.predict(X_test_scaled)
@@ -114,7 +113,6 @@ def train_classification_models(X_train: pd.DataFrame, X_test: pd.DataFrame,
             }
 
         except Exception as e:
-            # Let caller handle UI errors; return partial results
             results[model_name] = {"error": str(e)}
             continue
 
@@ -128,7 +126,6 @@ def train_regression_models(X_train: pd.DataFrame, X_test: pd.DataFrame,
     models = get_optimized_models("Regression")
     results: Dict[str, Dict[str, Any]] = {}
 
-    # Scale features for SVR and Linear Regression
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train)
     X_test_scaled = scaler.transform(X_test)
@@ -137,7 +134,6 @@ def train_regression_models(X_train: pd.DataFrame, X_test: pd.DataFrame,
         try:
             model = models[model_name]
 
-            # Use scaled data for models that benefit from scaling
             if model_name in ["Linear Regression", "SVR"]:
                 model.fit(X_train_scaled, y_train)
                 y_pred = model.predict(X_test_scaled)
@@ -177,7 +173,7 @@ def ml_pipeline(df: pd.DataFrame, target_col: str, problem_type: str,
     if X.empty or y.empty:
         return {}
 
-    # Train-test split with stratification for classification
+    # Train-test split
     if problem_type == "Classification" and len(y.unique()) > 1:
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=0.2, random_state=42, stratify=y
@@ -187,7 +183,6 @@ def ml_pipeline(df: pd.DataFrame, target_col: str, problem_type: str,
             X, y, test_size=0.2, random_state=42
         )
 
-    # Run based on problem type
     if problem_type == "Classification":
         results = train_classification_models(X_train, X_test, y_train, y_test, selected_models)
     else:
