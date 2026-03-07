@@ -11,7 +11,7 @@ from ydata_profiling import ProfileReport
 from streamlit_pandas_profiling import st_profile_report
 
 # Internal ML Engine
-from ml_engine import (
+from training_engine import (
     ml_pipeline,
     save_model,
 )
@@ -33,7 +33,7 @@ SIZE_PRESETS = {
     "Multiple subplots (2x2)": {"px": (1200, 1000), "figsize": (12, 10)}
 }
 
-DATA_PATH = os.path.join("data", "sample.csv")
+DATA_PATH = os.path.join("data", "test_data.csv")
 os.makedirs(os.path.dirname(DATA_PATH), exist_ok=True)
 
 # =============================================================================
