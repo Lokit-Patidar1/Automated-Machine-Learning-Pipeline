@@ -232,14 +232,12 @@ def get_chart_dimensions(preset_name: str) -> Tuple[Tuple[int, int], Tuple[int, 
     preset = SIZE_PRESETS.get(preset_name, SIZE_PRESETS["Quick EDA / Notebook visuals"])
     return preset["px"], preset["figsize"]
 
-@st.cache_data(ttl=3600)
 def load_dataset() -> pd.DataFrame:
     """Load dataset with caching for better performance"""
     if os.path.exists(DATA_PATH):
         return pd.read_csv(DATA_PATH, index_col=None)
     return None
 
-@st.cache_data(ttl=1800) 
 def get_dataset_stats(df: pd.DataFrame) -> Dict[str, Any]:
     """Calculate dataset statistics - cached to avoid recomputation"""
     return {
@@ -258,7 +256,6 @@ def save_matplotlib_to_png_bytes(fig) -> bytes:
     buf.seek(0)
     return buf.getvalue()
 
-@st.cache_data(show_spinner=False)
 def render_chart(df: pd.DataFrame, chart_type: str, columns: List[str], 
                  size_preset: str) -> Tuple[Any, bytes, bytes, str]:
     """
