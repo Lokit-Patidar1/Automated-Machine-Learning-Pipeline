@@ -1,0 +1,17 @@
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Streamlit and local artifacts
+.streamlit/secrets.toml
+*.pkl
+
+# Notebook / OS clutter
+.ipynb_checkpoints/
+.DS_Store
+Thumbs.db
