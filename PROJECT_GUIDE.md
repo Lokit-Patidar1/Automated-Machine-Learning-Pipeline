@@ -23,6 +23,6 @@
 
 ## Run Locally
 ```bash
-pip install -r python_dependencies.txt
+pip install -r requirements.txt
 streamlit run automl_app.py
 ```

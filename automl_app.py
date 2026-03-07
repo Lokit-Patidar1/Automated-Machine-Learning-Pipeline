@@ -6,9 +6,15 @@ from typing import Dict, Any, Tuple, List
 import pickle
 import io
 
-# EDA import files  
-from ydata_profiling import ProfileReport
-from streamlit_pandas_profiling import st_profile_report
+# EDA import files (optional)
+try:
+    from ydata_profiling import ProfileReport
+    from streamlit_pandas_profiling import st_profile_report
+    HAS_PROFILING = True
+except Exception:
+    ProfileReport = None
+    st_profile_report = None
+    HAS_PROFILING = False
 
 # Internal ML Engine
 from training_engine import (
@@ -694,7 +700,9 @@ elif choice == "📊 Data Analysis":
             </div>
             """, unsafe_allow_html=True)
             
-            if st.button("🔄 Generate Detailed Profiling Report", type="primary"):
+            if not HAS_PROFILING:
+                st.info("Profiling dependencies are missing in this environment. Install `ydata-profiling` and `streamlit-pandas-profiling` to enable this report.")
+            elif st.button("🔄 Generate Detailed Profiling Report", type="primary"):
                 with st.spinner("🔍 Analyzing dataset... This may take a few moments."):
                     try:
                         profile_report = ProfileReport(
