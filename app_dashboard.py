@@ -15,7 +15,7 @@ except Exception:
     ProfileReport = st_profile_report = None
     HAS_PROFILING = False
 
-from training_engine import ml_pipeline, save_model
+from ml_core import ml_pipeline, save_model
 import plotly.express as px
 import plotly.graph_objects as go
 
@@ -28,7 +28,7 @@ SIZE_PRESETS = {
     "Presentation / Report visuals":     {"px": (1400, 800)},
     "Multiple subplots (2x2)":           {"px": (1200, 1000)},
 }
-DATA_PATH = os.path.join("data", "test_data.csv")
+DATA_PATH = os.path.join("data", "sample_data.csv")
 os.makedirs("data", exist_ok=True)
 
 # ── Page config & CSS ────────────────────────────────────────────────────────
